@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedal Pushers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: auto;
+            padding: 10px;
+            background: #f0f0f0;
+        }
+        #game-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+            background: white;
+        }
+        button {
+            display: block;
+            margin: 5px 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h2>Pedal Pushers</h2>
+        <div id="game-text"></div>
+        <div id="game-choices"></div>
+    </div>
+
+    <script>
+        const gameState = {
+            location: "Home",
+            inventory: [],
+            reputation: 50,
+            policeAttention: 0,
+            day: 1
+        };
+
+        function updateText(text) {
+            document.getElementById('game-text').innerText = text;
+        }
+
+        function addChoice(text, action) {
+            const choiceDiv = document.getElementById('game-choices');
+            const button = document.createElement('button');
+            button.innerText = text;
+            button.onclick = action;
+            choiceDiv.appendChild(button);
+        }
+
+        function clearChoices() {
+            document.getElementById('game-choices').innerHTML = '';
+        }
+
+        function startGame() {
+            updateText("You wake up in your small room in Wheelham. It's another day to either pedal to earn or deal to profit. Where do you head first?");
+            clearChoices();
+            addChoice("Go to The Park", () => goToLocation("The Park"));
+            addChoice("Go to The Market", () => goToLocation("The Market"));
+            addChoice("Go to The Diner", () => goToLocation("The Diner"));
+            addChoice("Rest", rest);
+        }
+
+        function goToLocation(location) {
+            gameState.location = location;
+            updateText(`You arrive at ${location}. What do you do?`);
+            clearChoices();
+            if (location === "The Park") {
+                addChoice("Sell Drugs", sellDrugs);
+            } else if (location === "The Market") {
+                addChoice("Buy Drugs", buyDrugs);
+            } else if (location === "The Diner") {
+                addChoice("Gather Information", gatherInfo);
+            }
+            addChoice("Go back home", startGame);
+        }
+
+        function sellDrugs() {
+            updateText("You manage to sell some of your stash. Your reputation goes up slightly, but so does police attention.");
+            gameState.reputation += 5;
+            gameState.policeAttention += 2;
+            goToLocation("The Park");
+        }
+
+        function buyDrugs() {
+            updateText("You've bought some new stock. Now you can try to sell it.");
+            gameState.inventory.push("Drugs");
+            goToLocation("The Market");
+        }
+
+        function gatherInfo() {
+            updateText("You learn some useful gossip about the town. This might come in handy.");
+            goToLocation("The Diner");
+        }
+
+        function rest() {
+            updateText("You rest for the day, recovering your energy. The police attention decreases slightly.");
+            gameState.policeAttention = Math.max(0, gameState.policeAttention - 1);
+            gameState.day++;
+            startGame();
+        }
+
+        // Start the game
+        startGame();
+    </script>
+</body>
+</html>
